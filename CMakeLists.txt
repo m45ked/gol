@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(cpp)
 
+set(BUILD_SHARED_LIBS ON)
+
 if(NOT DEFINED _DISABLE_INSTALLATION)
   # This variable is responsible for installation disabling.
   set(_DISABLE_INSTALLATION FALSE)
@@ -16,17 +18,10 @@ endif()
 set(INSTALL_GTEST OFF)
 
 include(FetchContent)
+include(GenerateExportHeader)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
-
-add_executable(app
-    main.cpp
-    gol/mat.cpp
-    gol/mat.hpp
-    gol/StringFormatter.hpp
-    gol/StringFormatter.cpp
-)
 
 FetchContent_Declare(
   googletest
@@ -41,3 +36,11 @@ endif()
 
 enable_testing()
 include(GoogleTest)
+
+add_subdirectory(gol)
+
+add_executable(app
+    main.cpp
+)
+
+target_link_libraries(app gol)
