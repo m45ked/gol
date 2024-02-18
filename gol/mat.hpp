@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -30,10 +31,14 @@ using CoorContainer = std::vector<Coordinates>;
 using Cells = std::vector<Cell>;
 using Neightbours = Cells;
 
+using GenerationNo = unsigned;
+
 struct Stat {
   ColNo maxCols;
   RowNo maxRows;
 };
+
+using OnChangeFunction = std::function<void(Coordinates, State, GenerationNo)>;
 
 class Mat {
 public:
@@ -43,7 +48,7 @@ public:
   auto setDead(CoorContainer coor) -> void;
   auto setState(CoorContainer coor, State state) -> void;
 
-  Mat advance() const;
+  Mat advance(OnChangeFunction onChangeFunction = OnChangeFunction()) const;
 
   operator std::string() const {
     std::ostringstream output;
@@ -62,6 +67,7 @@ private:
 
   Stat m_stat;
   Cells m_cells;
+  GenerationNo m_generationNo{};
 };
 
 } // namespace gol

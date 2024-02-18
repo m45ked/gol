@@ -30,11 +30,16 @@ auto Mat::setState(CoorContainer coor, State state) -> void {
     m_cells.at(convertToIndex(c)).state = state;
 }
 
-Mat Mat::advance() const {
+Mat Mat::advance(OnChangeFunction onChangeFunction) const {
   Mat newGeneration{*this};
+  newGeneration.m_generationNo += 1;
 
   for (const Cell &cell : m_cells) {
-    newGeneration.setState({cell.coor}, getNewState(cell));
+    const State newState = getNewState(cell);
+    newGeneration.setState({cell.coor}, newState);
+    if (bool(onChangeFunction) && newState != cell.state) {
+      onChangeFunction(cell.coor, newState, newGeneration.m_generationNo);
+    }
   }
 
   return newGeneration;
