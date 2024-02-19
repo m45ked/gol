@@ -38,7 +38,8 @@ struct Stat {
   RowNo maxRows;
 };
 
-using OnChangeFunction = std::function<void(Coordinates, State, GenerationNo)>;
+using OnChangeFunction =
+    std::function<void(const Coordinates &, State, GenerationNo)>;
 
 class Mat {
 public:
