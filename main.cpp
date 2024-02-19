@@ -12,12 +12,15 @@
 
 namespace {
 
+using namespace std::chrono_literals;
+
 namespace po = boost::program_options;
 
 auto getOptions() -> po::options_description {
   po::options_description options{"Allowed options"};
   options.add_options()("help", "print help message")(
-      "size,S", po::value<int>(), "field size");
+      "size,S", po::value<int>(), "field size")(
+      "interval,I", po::value<int>(), "time interval between generations [ms]");
 
   return options;
 }
@@ -27,6 +30,7 @@ static const po::options_description opts{getOptions()};
 struct ApplicationContext {
   bool showHelp{};
   int matSize{20};
+  std::chrono::milliseconds interval{500ms};
 };
 
 auto parseCommandLine(int argc, char **argv) -> ApplicationContext {
@@ -40,6 +44,9 @@ auto parseCommandLine(int argc, char **argv) -> ApplicationContext {
 
   ctx.showHelp = map.count("help") != 0;
 
+  if (map.count("interval"))
+    ctx.interval = std::chrono::milliseconds{map["interval"].as<int>()};
+
   return ctx;
 }
 
@@ -52,8 +59,6 @@ auto moveTo(int row, int col) -> void {
 }
 
 } // namespace
-
-using namespace std::chrono_literals;
 
 int main(int argc, char **argv) {
   const ApplicationContext ctx{parseCommandLine(argc, argv)};
@@ -77,7 +82,7 @@ int main(int argc, char **argv) {
       std::cout << (state == gol::State::dead ? " " : "x");
       std::cout.flush();
     });
-    std::this_thread::sleep_for(500ms);
+    std::this_thread::sleep_for(ctx.interval);
   }
 
   return {};
